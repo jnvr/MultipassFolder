@@ -1,0 +1,30 @@
+version: '2'
+
+services:
+  
+  peer0.org5.jnvr.com:
+    # ---CHANGED--- Container name – same as the peer name
+    container_name: peer0.org5.jnvr.com
+    extends:
+      file: ../../base/peer-base.yaml
+      service: peer-base
+    environment:
+      # ---CHANGED--- changed to reflect peer name, org name and our company's domain
+      - CORE_PEER_ID=peer0.org5.jnvr.com
+      # ---CHANGED--- changed to reflect peer name, org name and our company's domain
+      - CORE_PEER_ADDRESS=peer0.org5.jnvr.com:7051
+      # ---CHANGED--- changed to reflect peer name, org name and our company's domain
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org5.jnvr.com:7051
+      # ---CHANGED--- changed to reflect peer name, org name and our company's domain
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org5.jnvr.com:7051
+      # ---CHANGED--- ensure that the MSP ID is correctly set of Org5
+      - CORE_PEER_LOCALMSPID=Org5MSP
+    volumes:
+        - /var/run/:/host/var/run/
+        # ---CHANGED--- changed to reflect peer name, org name and our company's domain
+        - ../../crypto-config/peerOrganizations/org5.jnvr.com/peers/peer0.org5.jnvr.com/msp:/etc/hyperledger/fabric/msp
+        # ---CHANGED--- changed to reflect peer name, org name and our company's domain
+        - ../../crypto-config/peerOrganizations/org5.jnvr.com/peers/peer0.org5.jnvr.com/tls:/etc/hyperledger/fabric/tls
+    ports:
+      - 11051:7051
+      - 11053:7053

@@ -1,0 +1,10 @@
+    PeerOrgs:
+    - Name: Org5
+      Domain: org5.jnvr.com
+      EnableNodeOUs: true
+      Template:
+        Count: 1
+        SANS:
+          - localhost
+      Users:
+        Count: 1
