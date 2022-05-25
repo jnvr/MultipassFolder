@@ -52,6 +52,8 @@ sudo apt-get install subversion -y
 rm node-v16.14.0-linux-x64.tar.gz
 rm go1.18.1.linux-amd64.tar.gz
 
+export PATH=/home/ubuntu/fabric-samples/bin:$PATH
+
 sudo cp -R ./sharedFolder/4host-swarm-clis/ ./fabric-samples/
 cd ./fabric-samples || exit
-sudo chmod -R 755 4host-swarm-clis/
+sudo chmod -R 777 4host-swarm-clis/
