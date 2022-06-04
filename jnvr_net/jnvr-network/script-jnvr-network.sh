@@ -7,7 +7,7 @@
 #This script eliminates ALL DOCKER CONTAINERS AND VOLUMES IN YOUR MACHINE, meaning if 
 #there is a network already running, THAT NETWORK'S CONTAINERS AND VOLUMES will be DELETED
 ##########################################################################################   
-
+export PATH=./fabric-samples/bin:$PATH
 rm -r ./channel-artifacts
 mkdir ./channel-artifacts
 sudo rm -r ./crypto-config
