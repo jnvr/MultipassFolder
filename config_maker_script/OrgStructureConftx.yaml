@@ -1,0 +1,20 @@
+    - &OrgTitle
+        Name: OrgName
+        ID: OrgName
+        MSPDir: MSPDirVar
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: readRule
+            Writers:
+                Type: Signature
+                Rule: writeRule
+            Admins:
+                Type: Signature
+                Rule: adminRule
+            Endorsement:
+                Type: Signature
+                Rule: endorseRule
+        AnchorPeers:
+            - Host: anchorPeer
+              Port: portNum

@@ -1,0 +1,21 @@
+  peerName.orgName:
+    container_name: peerName.orgName
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peerName.orgName
+      - CORE_PEER_ADDRESS=peerName.orgName:peerPort
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:peerPort
+      - CORE_PEER_CHAINCODEADDRESS=peerName.orgName:peerchainPort
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:peerchainPort
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peerBoot.orgBoot:portBoot
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peerName.orgName:peerPort
+      - CORE_PEER_LOCALMSPID=orgMSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - mspVolume
+        - tlsVolume
+        - peerName.orgName:/var/hyperledger/production
+    ports:
+      - peerPort:peerPort

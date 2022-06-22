@@ -1,0 +1,4 @@
+                - Host: hostOrderer
+                  Port: ordPort
+                  ClientTLSCert: tlsOrderer
+                  ServerTLSCert: tlsOrderer

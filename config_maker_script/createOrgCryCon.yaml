@@ -1,0 +1,7 @@
+- Name: nameInput  
+  Domain: domainInput  
+  EnableNodeOUs: true
+  Template:  
+    Count: 1
+  Users:
+    Count: 1
