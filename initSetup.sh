@@ -47,7 +47,9 @@ go version >>versions.txt
 echo " =========================================================================== "
 echo "---Install Subversion---"
 sudo apt-get install subversion -y
-
+echo " =========================================================================== "
+echo "---Install yq---"
+sudo snap install yq
 
 rm node-v16.14.0-linux-x64.tar.gz
 rm go1.18.1.linux-amd64.tar.gz
