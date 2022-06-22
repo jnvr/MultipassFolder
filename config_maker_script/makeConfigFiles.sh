@@ -1,9 +1,5 @@
 #!/bin/sh
     
-    #TODO                                                                                                             
-    #TODO ----- NAO ESQUECER DE ELIMINAR O FICHEIRO tempCodeRunnerFile.sh ANTES DE METER ISTO NO RELATORIO E NO GITHUB
-    #TODO                                                                                                             
-
     printf "\v $(tput setaf 7)$(tput setab 4)$(tput bold) All configurations are meant to be multi-host and will run a peer in each machine $(tput sgr 0)\n\n"
     echo "Introduce number of Organizations"
     read -r OrgNUM
