@@ -4,6 +4,8 @@
 #This script is suposed to be run in ...... directory
 
 #TODO ------ VER COMO SE PODE METER O fatalln E infoln A FUNCIONAR (COMO ESTÁ NO SCRIPT DO FABRIC SAMPLES)
+#TODO ------ FAZER COM QUE SE POSSA ESCOLHER O NUMERO DE ORGS E PEERS NO SINGLEHOST
+#TODO ------ ACHO Q VAI TER Q SE FAZER DESTE SCRIPT UM CRIADOR DOS OBJETOS NECESSÁRIOS PARA A CRIAÇÃO DA REDE E DPS UTILIZAM-SE OS PROCESSOS NORMAIS PARA CRIAR A REDE
 ################################################################################################################
 
 initConfig() {
@@ -49,18 +51,33 @@ multiHostConf() {
 
 ################################################################################################################
 #SingleHost Configuration assumes Multipass is installed and being used as the machine provider
-#This configuration also assumes that there is a folder
 ################################################################################################################
 singleHostConf() {
-    #This is assuming that MULTIPASS MACHINES WILL BE USED
-    # echo "Do you want to create a Multipass VM?(y/n)"
-    # read -r mpCreate
+    #########DEBUG#########
+    multipass delete coiso --purge
+    #######################
+    #Create Multipass Machine
+    echo "A Multipass virtual machine will be created. Introduce its name"
+    read -r nameVM
+    multipass launch 18.04 --name "$nameVM" -d 7G
+    
+    #Install Prerequisites
+    multipass exec "$nameVM" git clone https://github.com/jnvr/MultipassFolder
+    multipass exec "$nameVM" -- chmod --recursive 777 MultipassFolder/jnvr_net/jnvr-network/ # "--" is normally implicit but as flags are needed it must be explicitly defined
+    multipass exec "$nameVM" chmod 777 MultipassFolder/initSetup.sh
+    multipass exec "$nameVM" -- bash MultipassFolder/initSetup.sh
+    # multipass exec "$nameVM" -- echo "cd MultipassFolder/jnvr_net/jnvr-network" >> .bashrc
+    multipass exec "$nameVM" -- sed -i '$a cd MultipassFolder/jnvr_net/jnvr-network' .bashrc # https://www.toolbox.com/tech/operating-systems/question/use-sed-to-add-line-to-end-of-file-060909/
+    # multipass shell "$nameVM" #DEBUG
+    multipass exec "$nameVM" -- bash script-jnvr-network.sh
+    multipass exec "$nameVM" -- sed -i '$d' /home/ubuntu/.bashrc
+    multipass shell "$nameVM" #DEBUG
 
-    echo "A Multipass virtual machine will be created, introduce its name"
-    read -r mpVM
-    multipass launch --name "$mpVM" -d 7G
-
-    singleHostEXEC
+    #Initialize Network
+    multipass exec "$nameVM" pushd MultipassFolder/jnvr_net/jnvr-network/
+    multipass exec "$nameVM" ./script-jnvr-network.sh
+    multipass exec "$nameVM" popd
+    multipass shell "$nameVM" #DEBUG
 
 }
 
