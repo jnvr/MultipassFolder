@@ -159,36 +159,36 @@
         
     iter=1
     peerPort=7051
+    initpeerPort=7051
     while [ "$iter" -le "$OrgNUM" ]; do
-        # Add peer0 to each Org, this is done because peer0 configuration is different when compared to other peers, due to peer0 being the Bootstrap peer in the Organization
-        printf "\n$(tput setaf 3)$(tput bold)Adding peer0.Org$iter to docker-compose-base.yaml $(tput sgr 0)"        
-        item=$(cat peerStructureDocker.yaml) yq -ei '.services += env(item)' docker-compose-base.yaml
-        sed -i s/"peerName"/"peer0"/ docker-compose-base.yaml
-        sed -i s/"orgName"/"org$iter.example.com"/ docker-compose-base.yaml
-        sed -i s/"peerPort"/"$peerPort"/g docker-compose-base.yaml #In this command it is necessary to use 'g' modifier due to sed only replacing the first instance in a line by default
-        sed -i s/"peerchainPort"/"$((peerPort+1))"/ docker-compose-base.yaml
-        sed -i s/"peerBoot"/"peer1"/ docker-compose-base.yaml
-        sed -i s/"orgBoot"/"org$iter.example.com"/ docker-compose-base.yaml
-        peer1Port=$((peerPort+1000))
-        sed -i s/"portBoot"/"$peer1Port"/ docker-compose-base.yaml
-        sed -i s/"orgMSP"/"Org$iter\MSP"/ docker-compose-base.yaml
-        sed -i s/"mspVolume"/"..\/crypto-config\/peerOrganizations\/org$iter.example.com\/peers\/peer0.org$iter.example.com\/msp:\/etc\/hyperledger\/fabric\/msp"/ docker-compose-base.yaml
-        sed -i s/"tlsVolume"/"..\/crypto-config\/peerOrganizations\/org$iter.example.com\/peers\/peer0.org$iter.example.com\/tls:\/etc\/hyperledger\/fabric\/tls"/ docker-compose-base.yaml
-
-        # Add the rest of the peers in the Organization
-        peer0Port=$peerPort
-        peerPort=$((peerPort+1000))
-        jter=1
+        bootOrgIter=$((iter-1))
+        jter=0
         while [ "$jter" -lt "$PeerNUM" ]; do
+            # Add peers to the Organization
             printf "\n$(tput setaf 3)$(tput bold)Adding peer$jter.Org$iter to docker-compose-base.yaml $(tput sgr 0)"
             item=$(cat peerStructureDocker.yaml) yq -ei '.services += env(item)' docker-compose-base.yaml
             sed -i s/"peerName"/"peer$jter"/ docker-compose-base.yaml
             sed -i s/"orgName"/"org$iter.example.com"/ docker-compose-base.yaml
             sed -i s/"peerPort"/"$peerPort"/g docker-compose-base.yaml #In this command it is necessary to use 'g' modifier due to sed only replacing the first instance in a line by default
             sed -i s/"peerchainPort"/"$((peerPort+1))"/ docker-compose-base.yaml
-            sed -i s/"peerBoot"/"peer0"/ docker-compose-base.yaml
-            sed -i s/"orgBoot"/"org$iter.example.com"/ docker-compose-base.yaml
-            sed -i s/"portBoot"/"$peer0Port"/ docker-compose-base.yaml
+            
+            # Define CORE_PEER_GOSSIP_BOOTSTRAP as every other peer in the Organization
+            bootIter=0
+            bootPeerPort=$((initpeerPort+1000*PeerNUM*bootOrgIter))
+            while [ "$bootIter" -lt "$PeerNUM" ]; do
+                if [ "$bootIter" -eq "$jter" ]; then
+                    bootIter=$((bootIter+1))
+                    bootPeerPort=$((bootPeerPort+1000))
+                else
+                    sed -i s/"peerBoot"/"peer$bootIter"/ docker-compose-base.yaml
+                    sed -i s/"orgBoot"/"org$iter.example.com"/ docker-compose-base.yaml
+                    sed -i s/"portBoot"/"$bootPeerPort peerBoot.orgBoot:portBoot"/ docker-compose-base.yaml
+                    bootIter=$((bootIter+1))
+                    bootPeerPort=$((bootPeerPort+1000))
+                fi
+            done
+            sed -i 's/ peerBoot.orgBoot:portBoot//' docker-compose-base.yaml  
+            
             sed -i s/"orgMSP"/"Org$iter\MSP"/ docker-compose-base.yaml
             sed -i s/"mspVolume"/"..\/crypto-config\/peerOrganizations\/org$iter.example.com\/peers\/peer$jter.org$iter.example.com\/msp:\/etc\/hyperledger\/fabric\/msp"/ docker-compose-base.yaml
             sed -i s/"tlsVolume"/"..\/crypto-config\/peerOrganizations\/org$iter.example.com\/peers\/peer$jter.org$iter.example.com\/tls:\/etc\/hyperledger\/fabric\/tls"/ docker-compose-base.yaml
@@ -273,6 +273,7 @@
         echo "docker exec -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org$iter.example.com/users/Admin@org$iter.example.com/msp -e CORE_PEER_ADDRESS=peer0.org2.example.com:$corePeerOrg -e CORE_PEER_LOCALMSPID="\"Org${iter}MSP\"" -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org$iter.example.com/peers/peer0.org$iter.example.com/tls/ca.crt cli peer channel update -o orderer.example.com:7050 -c mychannel -f ./channel-artifacts/Org$iter MSPanchors.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem" >> mychannel.sh
         iter=$((iter+1))
     done
+
 
     ##########################################################################################################
     ############################### Creation of host<#>up.sh & host<#>down.sh  ###############################
